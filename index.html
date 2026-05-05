@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Academic Transfer Planner — Ilia State University</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e334d;
+    --accent: #f5a623;
+    --accent2: #7c6af7;
+    --text: #e8eaf0;
+    --muted: #8892aa;
+    --yes: #34d399;
+    --no: #f87171;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background:var(--bg); color:var(--text); font-family:'Georgia',serif; min-height:100vh; padding:0 0 60px; }
+
+  header {
+    background: linear-gradient(135deg,#12152b 0%,#1a1f3a 60%,#0f1117 100%);
+    border-bottom:1px solid var(--border);
+    padding:36px 40px 28px;
+    position:relative; overflow:hidden;
+  }
+  header::before {
+    content:''; position:absolute; top:-60px; right:-60px;
+    width:260px; height:260px;
+    background:radial-gradient(circle,rgba(124,106,247,.18) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  header::after {
+    content:''; position:absolute; bottom:-40px; left:30%;
+    width:180px; height:180px;
+    background:radial-gradient(circle,rgba(245,166,35,.10) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .header-tag {
+    display:inline-block; font-family:'Courier New',monospace;
+    font-size:10px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--accent); border:1px solid rgba(245,166,35,.35);
+    padding:3px 10px; border-radius:3px; margin-bottom:14px;
+  }
+  h1 { font-size:clamp(22px,4vw,34px); font-weight:normal; letter-spacing:.5px; line-height:1.2; }
+  h1 span { color:var(--accent); }
+  .program-badge {
+    display:inline-flex; align-items:center; gap:8px; margin-top:14px;
+    background:rgba(124,106,247,.15); border:1px solid rgba(124,106,247,.3);
+    padding:6px 16px; border-radius:20px; font-size:13px; color:#b5aef9;
+  }
+  .program-badge .dot {
+    width:7px; height:7px; background:var(--accent2);
+    border-radius:50%; animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  main { max-width:1100px; margin:0 auto; padding:36px 24px 0; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media(max-width:720px){ .grid{ grid-template-columns:1fr; } }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .card-header {
+    padding:16px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:10px; background:var(--surface2);
+  }
+  .card-header .icon {
+    width:28px; height:28px; background:rgba(245,166,35,.12);
+    border:1px solid rgba(245,166,35,.25); border-radius:6px;
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+  }
+  .card-header h2 {
+    font-size:13px; font-weight:normal; font-family:'Courier New',monospace;
+    letter-spacing:1.5px; text-transform:uppercase; color:var(--muted);
+  }
+
+  .table-wrap { overflow-x:auto; max-height:520px; overflow-y:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th {
+    background:var(--surface2); color:var(--muted); text-transform:uppercase;
+    font-size:10px; letter-spacing:2px; font-family:'Courier New',monospace;
+    font-weight:normal; padding:10px 16px; text-align:left;
+    position:sticky; top:0; border-bottom:1px solid var(--border);
+  }
+  td { padding:9px 16px; border-bottom:1px solid rgba(46,51,77,.5); vertical-align:middle; line-height:1.4; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,.025); }
+  .badge {
+    display:inline-block; padding:2px 9px; border-radius:4px;
+    font-size:11px; font-family:'Courier New',monospace; font-weight:bold; letter-spacing:.5px;
+  }
+  .badge-yes { background:rgba(52,211,153,.12); color:var(--yes); border:1px solid rgba(52,211,153,.25); }
+  .badge-no  { background:rgba(248,113,113,.10); color:var(--no);  border:1px solid rgba(248,113,113,.22); }
+
+  .controls-card { margin-top:24px; }
+  .controls-inner { padding:24px 20px; display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px; }
+  .field { display:flex; flex-direction:column; gap:7px; }
+  label { font-family:'Courier New',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  select {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    font-family:'Georgia',serif; font-size:14px; padding:10px 14px;
+    border-radius:var(--radius); cursor:pointer; outline:none; min-width:280px;
+    transition:border-color .2s; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238892aa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
+  }
+  select:focus { border-color:var(--accent); }
+  .btn {
+    background:var(--accent); color:#0f1117; border:none; padding:10px 28px;
+    border-radius:var(--radius); font-family:'Courier New',monospace; font-size:12px;
+    letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-weight:bold;
+    transition:background .2s,transform .1s,box-shadow .2s;
+  }
+  .btn:hover { background:#ffc04a; box-shadow:0 0 20px rgba(245,166,35,.3); }
+  .btn:active { transform:scale(.97); }
+
+  #result-section { margin-top:24px; display:none; }
+  #result-section.visible { display:block; animation:fadeUp .4s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .result-header-row {
+    padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface2);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  .result-meta { font-family:'Courier New',monospace; font-size:11px; color:var(--muted); }
+  .result-meta strong { color:var(--accent); }
+  .equiv-source { color:var(--accent2); }
+  .equiv-target { color:var(--yes); }
+  .equiv-na { color:var(--muted); font-style:italic; }
+
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Ilia State University — School of Technology</div>
+  <h1>Academic <span>Transfer</span> Planner</h1>
+  <div class="program-badge">
+    <span class="dot"></span>
+    Current Program: <strong>Computer Science (Bachelor's, 240 ECTS)</strong>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="icon">📋</div>
+        <h2>My Courses — Argus Record</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Course</th><th>Passed</th></tr></thead>
+          <tbody id="course-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div class="icon">📊</div>
+          <h2>Course Statistics</h2>
+        </div>
+        <div id="stats" style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+      </div>
+
+      <div class="card controls-card" style="margin-top:20px;">
+        <div class="card-header">
+          <div class="icon">🎯</div>
+          <h2>Transfer Options</h2>
+        </div>
+        <div class="controls-inner">
+          <div class="field">
+            <label>Target Program</label>
+            <select id="program-select">
+              <option value="">— Select a program —</option>
+              <option value="Computer Engineering">Computer Engineering</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+              <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering</option>
+            </select>
+          </div>
+          <button class="btn" onclick="runTransfer()">Transfer →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-section" class="card">
+    <div class="result-header-row">
+      <div class="card-header" style="border:none;background:none;padding:0;">
+        <div class="icon">⚡</div>
+        <h2>Equivalency Table</h2>
+      </div>
+      <div class="result-meta">Transferring to: <strong id="target-label"></strong></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Your Course (Computer Science)</th>
+            <th>Equivalent Course in Target Program</th>
+          </tr>
+        </thead>
+        <tbody id="equiv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const courses = [
+  { name: "English Language I",                        passed: true  },
+  { name: "Calculus I",                                passed: true  },
+  { name: "Introduction to Programming",               passed: true  },
+  { name: "Discrete Mathematics",                      passed: true  },
+  { name: "English Language II",                       passed: true  },
+  { name: "Calculus II",                               passed: true  },
+  { name: "Linear Algebra",                            passed: true  },
+  { name: "Object-Oriented Programming",               passed: true  },
+  { name: "Data Structures",                           passed: true  },
+  { name: "Statistics and Probability",                passed: true  },
+  { name: "Algorithms",                                passed: false },
+  { name: "Computer Organization and Architecture",    passed: false },
+  { name: "Database Systems",                          passed: false },
+  { name: "Operating Systems",                         passed: false },
+  { name: "Introduction to Artificial Intelligence",   passed: false },
+  { name: "Computer Networks",                         passed: true  },
+  { name: "Software Engineering",                      passed: true  },
+  { name: "Human-Computer Interaction",                passed: true  },
+  { name: "Cybersecurity Fundamentals",                passed: true  },
+  { name: "Machine Learning",                          passed: true  },
+];
+
+const equivalency = {
+  "Computer Engineering": {
+    "English Language I":                    "English Language I",
+    "Calculus I":                            "Calculus I",
+    "Introduction to Programming":           "Introduction to Programming",
+    "Discrete Mathematics":                  "Discrete Mathematics",
+    "English Language II":                   "English Language II",
+    "Calculus II":                           "Calculus II",
+    "Linear Algebra":                        "Linear Algebra",
+    "Object-Oriented Programming":           "Object-Oriented Programming",
+    "Data Structures":                       "Data Structures and Algorithms",
+    "Statistics and Probability":            "Probability Theory and Statistics",
+    "Computer Networks":                     "Computer Networks and Communication Protocols",
+    "Software Engineering":                  "Software Engineering",
+    "Human-Computer Interaction":            "N/A",
+    "Cybersecurity Fundamentals":            "N/A",
+    "Machine Learning":                      "N/A",
+  },
+  "Civil Engineering": {
+    "English Language I":                    "English Language I",
+    "Calculus I":                            "Calculus I",
+    "Introduction to Programming":           "N/A",
+    "Discrete Mathematics":                  "N/A",
+    "English Language II":                   "English Language II",
+    "Calculus II":                           "Calculus II",
+    "Linear Algebra":                        "Linear Algebra",
+    "Object-Oriented Programming":           "N/A",
+    "Data Structures":                       "N/A",
+    "Statistics and Probability":            "Engineering Statistics",
+    "Computer Networks":                     "N/A",
+    "Software Engineering":                  "N/A",
+    "Human-Computer Interaction":            "N/A",
+    "Cybersecurity Fundamentals":            "N/A",
+    "Machine Learning":                      "N/A",
+  },
+  "Electrical and Electronics Engineering": {
+    "English Language I":                    "English Language I",
+    "Calculus I":                            "Calculus I",
+    "Introduction to Programming":           "Programming for Engineers",
+    "Discrete Mathematics":                  "N/A",
+    "English Language II":                   "English Language II",
+    "Calculus II":                           "Calculus II",
+    "Linear Algebra":                        "Linear Algebra",
+    "Object-Oriented Programming":           "N/A",
+    "Data Structures":                       "N/A",
+    "Statistics and Probability":            "Probability Theory and Statistics",
+    "Computer Networks":                     "Telecommunications and Networks",
+    "Software Engineering":                  "N/A",
+    "Human-Computer Interaction":            "N/A",
+    "Cybersecurity Fundamentals":            "N/A",
+    "Machine Learning":                      "N/A",
+  },
+};
+
+function renderCourses() {
+  const tbody = document.getElementById("course-tbody");
+  courses.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${c.name}</td>
+      <td><span class="badge ${c.passed ? 'badge-yes':'badge-no'}">${c.passed ? 'Yes':'No'}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderStats() {
+  const total  = courses.length;
+  const passed = courses.filter(c => c.passed).length;
+  const failed = total - passed;
+  const pct    = Math.round((passed/total)*100);
+  const stats  = [
+    { label:"Total Courses", value:total,    color:"var(--text)"   },
+    { label:"Passed",        value:passed,   color:"var(--yes)"    },
+    { label:"Not Passed",    value:failed,   color:"var(--no)"     },
+    { label:"Pass Rate",     value:pct+"%",  color:"var(--accent)" },
+  ];
+  const el = document.getElementById("stats");
+  stats.forEach(s => {
+    el.innerHTML += `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+        <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:1.5px;
+                    text-transform:uppercase;color:var(--muted);margin-bottom:6px;">${s.label}</div>
+        <div style="font-size:26px;font-weight:bold;color:${s.color};">${s.value}</div>
+      </div>`;
+  });
+}
+
+function runTransfer() {
+  const program = document.getElementById("program-select").value;
+  if (!program) { alert("Please select a target program first."); return; }
+  const map   = equivalency[program];
+  const tbody = document.getElementById("equiv-tbody");
+  tbody.innerHTML = "";
+  courses.filter(c => c.passed).forEach(c => {
+    const equiv = (map[c.name] !== undefined) ? map[c.name] : "N/A";
+    const isNA  = equiv === "N/A";
+    tbody.innerHTML += `
+      <tr>
+        <td class="equiv-source">${c.name}</td>
+        <td class="${isNA?'equiv-na':'equiv-target'}">${equiv}</td>
+      </tr>`;
+  });
+  document.getElementById("target-label").textContent = program;
+  const s = document.getElementById("result-section");
+  s.classList.add("visible");
+  s.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+renderCourses();
+renderStats();
+</script>
+</body>
+</html>
